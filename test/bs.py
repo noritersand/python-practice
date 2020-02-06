@@ -7,8 +7,8 @@ soup = BeautifulSoup(html_doc, 'html.parser')
 
 subjects = soup.select('.item-subject')  #게시글 클래스 선택
 for subject in subjects:
-##    print(subject.select_one('.item-subject').text)
-    print(subject.text)
-
-##print(soup.get_text())
-
+##    print(subject.text)
+##    print(type(subject.select_one('span.wr-new')))
+##    print(type(subject.select_one('span.wr-newasd')))
+##    print(subject.select_one('span.wr-new') is str)
+    print(subject.select_one('span.wr-new')['class'])
