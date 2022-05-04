@@ -1,6 +1,8 @@
-import datetime
-time = datetime.datetime.now()
-print(type(time));
+from datetime import datetime
+now = datetime.now()
+print(type(now))
+print(now.date())
 
-if time.hour() >= 0 and time.hour() < 7:
+if now.hour >= 0 and now.hour < 7:
     print('ㅎㅇ')
+
