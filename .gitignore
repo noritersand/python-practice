@@ -133,5 +133,7 @@ dmypy.json
 
 # #########################
 result.txt
+output*
+db.py
 
 poetry-test
