@@ -1,0 +1,4 @@
+ACCOUNT = {
+    'id': 'MY_ID',
+    'password': 'MY_PASSWORD'
+}

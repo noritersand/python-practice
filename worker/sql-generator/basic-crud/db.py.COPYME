@@ -1,0 +1,19 @@
+"""
+Database Configuration File for MariaDB
+Configure your database connection here
+"""
+
+# Database type: 'mysql' (MariaDB uses MySQL protocol)
+DB_TYPE = 'mysql'
+
+# MariaDB connection configuration
+DB_CONFIG = {
+    'mysql': {  # MariaDB는 MySQL 프로토콜 사용
+        'host': 'localhost',
+        'port': 3306,
+        'user': 'root',
+        'password': 'password',
+        'database': 'your_database',
+        'charset': 'utf8mb4'
+    }
+}
