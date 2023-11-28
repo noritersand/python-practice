@@ -5,7 +5,7 @@ import shutil  # save img locally
 from target_list import image_list
 
 dependsOnUrl = False # True
-extension = '.png'
+extension = ''
 target = image_list
 
 parentDir = "c:/dev/test/"
