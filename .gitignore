@@ -133,6 +133,7 @@ dmypy.json
 
 # #########################
 result.txt
+result/
 output*
 db.py
 
