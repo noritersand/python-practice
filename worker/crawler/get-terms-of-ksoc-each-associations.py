@@ -1,55 +1,72 @@
-import requests
-from bs4 import BeautifulSoup
+import argparse
+import codecs
+import time
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager # 자동 드라이버 관리
+from selenium.common.exceptions import NoAlertPresentException
+from selenium.webdriver.common.alert import Alert
 
-# 세션을 사용해 로그인 상태 유지
-session = requests.Session()
+parser = argparse.ArgumentParser(description="아규먼트 처리 스크립트")
+parser.add_argument("--no", help="종목 번호", default='2052')
+parser.add_argument("--code", help="종목 코드", default='KR')
+parser.add_argument("--name", help="종목 이름", default='사실이건아무거나해도상관없는값')
+args = parser.parse_args()
+print("args.no:", args.no)
+print("args.code:", args.code)
+print("args.name:", args.name)
 
-# 로그인 정보
-login_url = 'https://example.com/login'  # 실제 로그인 URL로 변경
-login_data = {
-    'username': 'your_username',  # 실제 사용자 이름
-    'password': 'your_password'   # 실제 비밀번호
-}
+# 브라우저가 닫히지 않도록 설정
+# chrome_options = Options()
+# chrome_options.add_experimental_option('detach', True)
+# driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
 
-# 로그인 요청
-response = session.post(login_url, data=login_data)
+driver.implicitly_wait(5) # 엘리먼트를 찾을 때 최대 5초 대기
 
-# 로그인 성공 여부 확인 (상태 코드 200이면 성공)
-if response.status_code == 200:
-    print("로그인 성공")
-else:
-    print("로그인 실패")
-    exit()
+# 로그인 페이지로 이동
+driver.get('https://g1.sports.or.kr/member/login.do?retUrl=%2Findex.do')
 
-# POST 요청으로 이동할 페이지
-target_url = 'https://example.com/target_page'  # 실제 타겟 URL로 변경
-post_data = {
-    'key1': 'value1',  # 필요한 POST 데이터 (사이트마다 다름)
-    'key2': 'value2'
-}
+# 아이디와 비밀번호 입력 필드 찾기
+username_field = driver.find_element(By.NAME, 'userId')
+password_field = driver.find_element(By.NAME, 'passwd')
 
-# POST 요청 보내기
-target_response = session.post(target_url, data=post_data)
+# 아이디와 비밀번호 입력
+username_field.send_keys('fixalot') # 실제 아이디
+password_field.send_keys('fZ6R@i5wJpC7!t') # 실제 비밀번호
 
-# 버튼 클릭 시뮬레이션 (사이트가 JavaScript로 동작하지 않는다고 가정)
-soup = BeautifulSoup(target_response.text, 'html.parser')
+# 로그인 버튼 찾고 클릭
+driver.find_element(By.CSS_SELECTOR, 'input[type="submit"]').click()
 
-# 버튼을 찾아서 해당 URL로 이동 (예: 버튼이 링크를 포함한 경우)
-button_link = soup.find('a', {'class': 'button-class'})  # 버튼의 실제 클래스나 속성으로 변경
-if button_link and 'href' in button_link.attrs:
-    final_url = button_link['href']
-    final_response = session.get(final_url)
-    
-    # 최종 페이지에서 데이터 긁어오기
-    final_soup = BeautifulSoup(final_response.text, 'html.parser')
-    content = final_soup.find('div', {'class': 'content-class'})  # 긁어올 내용의 실제 태그와 클래스
-    
-    if content:
-        print("긁어온 내용:", content.text.strip())
-    else:
-        print("내용을 찾을 수 없음")
-else:
-    print("버튼을 찾을 수 없음")
+# 로그인 성공 여부 확인
+try:
+    success_element = driver.find_element(By.CLASS_NAME, 'inner-contents__center') # 엘리먼트를 못찾으면 에러 발생함
+    # print('로그인 성공:', success_element.text)
+    print('로그인 성공')
+except:
+    print('로그인 실패')
 
-# 세션 종료
-session.close()
+# driver.get('https://g1.sports.or.kr/pinfo/index/sc000.do') # 페이지 이동
+driver.execute_script("movePinfo()")
+time.sleep(1)
+driver.execute_script(f"fnMoveClass('P', '{args.no}', '{args.code}', '{args.name}')")
+time.sleep(1)
+
+driver.get('https://g1.sports.or.kr/pinfo/player/sc246.do')
+
+content_element = driver.find_element(By.CSS_SELECTOR, 'div.content')
+
+f = codecs.open(f'{args.no}-result.html', 'w', 'utf-8')
+f.write(content_element.get_attribute('innerHTML'))
+
+# ----- 마무-으리 -----
+
+print('현재 주소:', driver.current_url)
+
+# 5초 후 브라우저 종료
+print('3초 후 브라우저 종료됨')
+time.sleep(3)
+
+driver.quit()
