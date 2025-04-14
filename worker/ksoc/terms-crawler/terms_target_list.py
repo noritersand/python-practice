@@ -191,8 +191,13 @@ terms_target_list = [
     },
     {
         'code': 'BA',
-        'name': '야구소프트볼',
+        'name': '야구소프트볼(야구)',
         'codeNo': '2019'
+    },
+    {
+        'code': 'SB',
+        'name': '야구소프트볼(소프트볼)',
+        'codeNo': '2044'
     },
     {
         'code': 'AR',
