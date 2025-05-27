@@ -42,8 +42,8 @@ def post_member(member_id):
         fail_logger.error(error_message)
         return error_message
 
-# 파일에서 member_id 리스트 읽기
-with open('./member-ids', 'r') as f:
+# 파일에서 대상 목록 읽기
+with open('./targets', 'r') as f:
     member_ids = [line.strip() for line in f if line.strip()]
 
 futures = []
