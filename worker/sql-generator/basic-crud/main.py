@@ -274,7 +274,6 @@ class MapperGenerator:
         
         xml_content = f"""<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-
 <mapper namespace="FILL_THIS_VALUE">
 
 {self.generate_insert()}
@@ -305,7 +304,7 @@ public interface {self.mapper_name} {{
      * @param entity 입력값 
      * @return 처리 개수
      */
-    int insert{self.entity_name}({entity_param});
+    int insert{self.entity_name}({self.entity_name}Entity entity);
 
     /**
      * {self.table_name} 기본 update 메서드
@@ -313,7 +312,7 @@ public interface {self.mapper_name} {{
      * @param entity 입력값
      * @return 처리 개수
      */
-    int update{self.entity_name}({entity_param});
+    int update{self.entity_name}({self.entity_name}Entity entity);
 
     /**
      * {self.table_name} 기본 delete 메서드
