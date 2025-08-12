@@ -296,9 +296,12 @@ class MapperGenerator:
         pk_type = self.primary_key['java_type'].split('.')[-1] if self.primary_key else "Long"
         entity_param = f"{self.entity_name}Entity {self._to_camel_case(self.entity_name)}"
         
-        interface_content = f"""public interface {self.mapper_name} {{
+        interface_content = f"""/**
+ * {self.table_name} 테이블용 마이바티스 쿼리 매퍼
+ */
+public interface {self.mapper_name} {{
     /**
-     * TODO WRITE_THIS_COMMENT
+     * {self.table_name} 기본 insert 메서드
      *
      * @param entity 입력값 
      * @return 처리 개수
@@ -306,7 +309,7 @@ class MapperGenerator:
     int insert{self.entity_name}({entity_param});
 
     /**
-     * TODO WRITE_THIS_COMMENT
+     * {self.table_name} 기본 update 메서드
      * 
      * @param entity 입력값
      * @return 처리 개수
@@ -314,7 +317,7 @@ class MapperGenerator:
     int update{self.entity_name}({entity_param});
 
     /**
-     * TODO WRITE_THIS_COMMENT
+     * {self.table_name} 기본 delete 메서드
      *
      * @param params 검색 조건
      * @return 처리 개수
@@ -322,7 +325,7 @@ class MapperGenerator:
     int delete{self.entity_name}(FILL_THIS_TYPE params);
 
     /**
-     * TODO WRITE_THIS_COMMENT
+     * {self.table_name} 기본 단 건 select 메서드
      *
      * @param params 검색 조건
      * @return 조회 결과
