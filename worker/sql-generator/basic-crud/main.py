@@ -20,7 +20,8 @@ def print_usage():
     print("\nThis tool generates:")
     print("  - MyBatis Mapper XML file")
     print("  - Java Mapper Interface file")
-    print("\nGenerated files will be saved in 'result' directory")
+    print("  - Java Entity Class file")
+    print("\nGenerated files will be saved in 'result/<table_name>/' directory")
 
 
 def main():
@@ -44,7 +45,7 @@ def main():
     try:
         # Generate mapper files
         generator = MapperGenerator(table_name)
-        xml_path, java_path = generator.generate()
+        xml_path, java_path, entity_path = generator.generate()
         
         print("\n" + "=" * 50)
         print("✨ Generation completed successfully!")

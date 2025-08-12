@@ -17,7 +17,8 @@ class MapperGenerator:
         self.mapper_name = f"{self.entity_name}Mapper"
         self.columns = []
         self.primary_keys = []
-        self.audit_columns = ['creator', 'createDt', 'updater', 'updateDt']
+        self.table_comment = ""
+        self.audit_columns = ['creator', 'createDt', 'updater', 'updateDt']  # Removed syncTrigger
         
         # Fetch metadata on initialization
         self._load_metadata()
@@ -28,6 +29,7 @@ class MapperGenerator:
         self.table_name = metadata['table_name']  # Use actual table name from DB
         self.columns = metadata['columns']
         self.primary_keys = metadata['primary_keys']
+        self.table_comment = metadata.get('table_comment', '')
         
         if not self.columns:
             raise ValueError(f"No columns found for table {self.table_name}")
@@ -144,8 +146,8 @@ class MapperGenerator:
             where_conditions.append(f"{pk['db_name']} = #{{{pk['java_name']}}}")
         where_clause = '\n        and '.join(where_conditions)
         
-        # Use FILL_THIS_VALUE for resultType
-        result_type = "FILL_THIS_VALUE"
+        # Use FILL_THIS_TYPE for resultType
+        result_type = "FILL_THIS_TYPE"
         
         return f"""    <select id="get{self.entity_name}" resultType="{result_type}">
         /*{self.mapper_name}.get{self.entity_name}*/
@@ -163,7 +165,7 @@ class MapperGenerator:
         if has_update:
             xml_content = f"""<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="FILL_THIS_VALUE">
+<mapper namespace="FILL_THIS_TYPE">
 
 {self.generate_insert()}
 
@@ -179,7 +181,7 @@ class MapperGenerator:
             print(f"ℹ️  Table {self.table_name} does not have updater/updateDt columns - skipping UPDATE generation")
             xml_content = f"""<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="FILL_THIS_VALUE">
+<mapper namespace="FILL_THIS_TYPE">
 
 {self.generate_insert()}
 
@@ -241,10 +243,81 @@ public interface {self.mapper_name} {{
         
         return interface_content
     
-    def save_to_file(self, xml_content: str, java_content: str):
-        """Save generated XML and Java files"""
-        # Create result directory if it doesn't exist
-        output_dir = Path("result")
+    def generate_entity_class(self) -> str:
+        """Generate Java Entity Class"""
+        # Separate audit columns from regular columns
+        regular_columns = [col for col in self.columns 
+                          if col['db_name'] not in self.audit_columns]
+        
+        # Build field declarations
+        fields = []
+        for col in regular_columns:
+            comment = col.get('comment', '')
+            if comment:
+                fields.append(f"    /**\n     * {comment}\n     */")
+            else:
+                fields.append(f"    /**\n     * {col['db_name']}\n     */")
+            
+            # Get simple Java type name (remove package prefix)
+            java_type = col['java_type']
+            if '.' in java_type:
+                # Keep full name for java.time types and BigDecimal
+                if 'java.time' in java_type or 'BigDecimal' in java_type:
+                    type_name = java_type
+                else:
+                    type_name = java_type.split('.')[-1]
+            else:
+                type_name = java_type
+            
+            fields.append(f"    private {type_name} {col['java_name']};")
+        
+        fields_str = '\n'.join(fields)
+        
+        # Always extend AuditColumns
+        extends_clause = " extends AuditColumns"
+        
+        # Add imports
+        imports = [
+            "import com.ana.anypass.common.model.AuditColumns;"
+        ]
+        
+        # Add imports for Java types
+        if any('java.time.LocalDateTime' in col['java_type'] for col in regular_columns):
+            imports.append("import java.time.LocalDateTime;")
+        if any('java.time.LocalDate' in col['java_type'] for col in regular_columns):
+            imports.append("import java.time.LocalDate;")
+        if any('java.time.LocalTime' in col['java_type'] for col in regular_columns):
+            imports.append("import java.time.LocalTime;")
+        if any('BigDecimal' in col['java_type'] for col in regular_columns):
+            imports.append("import java.math.BigDecimal;")
+        
+        imports.extend([
+            "import lombok.Getter;",
+            "import lombok.Setter;"
+        ])
+        
+        imports_str = '\n'.join(imports)
+        
+        # Generate class comment
+        table_desc = f"{self.table_name} {self.table_comment}" if self.table_comment else self.table_name
+        
+        entity_content = f"""{imports_str}
+
+/**
+ * {table_desc} 테이블 클래스
+ */
+@Getter
+@Setter
+public class {self.entity_name}Entity{extends_clause} {{
+{fields_str}
+}}"""
+        
+        return entity_content
+    
+    def save_to_file(self, xml_content: str, java_content: str, entity_content: str):
+        """Save generated XML, Java Interface, and Entity files"""
+        # Create result/<table_name> directory
+        output_dir = Path("result") / self.table_name
         output_dir.mkdir(parents=True, exist_ok=True)
         
         # Generate filename with timestamp
@@ -262,13 +335,21 @@ public interface {self.mapper_name} {{
         with open(java_filepath, 'w', encoding='utf-8') as f:
             f.write(java_content)
         
-        print(f"✅ Files generated successfully!")
+        # Save Entity class file
+        entity_filename = f"{self.entity_name}Entity_{timestamp}.java"
+        entity_filepath = output_dir / entity_filename
+        with open(entity_filepath, 'w', encoding='utf-8') as f:
+            f.write(entity_content)
+        
+        print(f"✅ Files generated successfully in temp/{self.table_name}/")
         print(f"📁 XML file: {xml_filepath}")
-        print(f"📁 Java file: {java_filepath}")
-        return xml_filepath, java_filepath
+        print(f"📁 Mapper Interface: {java_filepath}")
+        print(f"📁 Entity Class: {entity_filepath}")
+        return xml_filepath, java_filepath, entity_filepath
     
     def generate(self):
-        """Generate both XML and Java files"""
+        """Generate XML, Java Interface, and Entity files"""
         xml_content = self.generate_mapper_xml()
         java_content = self.generate_mapper_interface()
-        return self.save_to_file(xml_content, java_content)
+        entity_content = self.generate_entity_class()
+        return self.save_to_file(xml_content, java_content, entity_content)
