@@ -4,33 +4,34 @@
 
 #### environments
 
-- Python 3.8.1
+- Python 3.x.x
 
 
 ## 파이썬 설치
 
-[다운로드 링크](https://www.python.org/downloads/)
-
-
-## 모듈 설치
-
-pip로 설치함:
+~~[다운로드 링크](https://www.python.org/downloads/)~~ Windows면 Chocolatey로 설치:
 
 ```bash
-pip install 모듈명1 모듈명2 모듈명3 ...
+choco install python
 ```
 
-pip는 윈도우10 + 기본 설치일 경우 `C:\Users\윈도우유저명\AppData\Local\Programs\Python\Python38-32\Scripts` 요딴 경로에 있다.
 
-ℹ️ 의존성 관리는 pip 보단 [Poetry](https://python-poetry.org/)를 쓰는 것이 좋다.
+## 패키지 설치
 
+~~pip로 설치함. pip는 설치 기본 경로는 `C:\Users\윈도우유저명\AppData\Local\Programs\Python\Python38-32\Scripts` 요런식~~
 
-## 파이썬 파일 실행
-
-파일이 있는 경로에서 `py`로 실행:
+uv로 설치함:
 
 ```bash
-py test.py
+uv init
+uv add PACKAGE_NAME
 ```
 
-IDLE 편집기로 편집 중이라면 `f5`로 편집 중인 파일 즉시 실행할 수 있음
+
+## 스크립트 실행
+
+파일이 있는 경로에서 ~~`py`로~~ `uv`로 실행:
+
+```bash
+uv run test.py
+```
