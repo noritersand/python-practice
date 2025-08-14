@@ -169,9 +169,9 @@ class DatabaseConnector:
         tables = cursor.fetchall()
         available_tables = [table[0] for table in tables]
         
-        print(f"📋 Available tables in database: {', '.join(available_tables[:10])}")
-        if len(available_tables) > 10:
-            print(f"   ... and {len(available_tables) - 10} more tables")
+        # print(f"📋 Available tables in database: {', '.join(available_tables[:10])}")
+        # if len(available_tables) > 10:
+        #     print(f"   ... and {len(available_tables) - 10} more tables")
         
         # Check if the table exists (case-insensitive)
         matching_tables = [t for t in available_tables if t.lower() == table_name.lower()]
