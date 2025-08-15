@@ -46,15 +46,35 @@ class MapperGenerator:
                          if not (col.get('is_auto_increment', False))
                          and col['db_name'] not in ['createDt', 'updateDt']]
         
-        column_list = ',\n            '.join([col['db_name'] for col in insert_columns])
-        value_list = ',\n            '.join([f"#{{{col['java_name']}}}" for col in insert_columns])
+        # Format columns and values in groups of 4
+        column_names = [col['db_name'] for col in insert_columns]
+        value_names = [f"#{{{col['java_name']}}}" for col in insert_columns]
+        
+        # Group columns in rows of 4
+        column_rows = []
+        value_rows = []
+        
+        for i in range(0, len(column_names), 4):
+            column_row = ', '.join(column_names[i:i+4])
+            value_row = ', '.join(value_names[i:i+4])
+            
+            # Add proper indentation
+            if i == 0:
+                column_rows.append(f"            {column_row}")
+                value_rows.append(f"            {value_row}")
+            else:
+                column_rows.append(f"            {column_row}")
+                value_rows.append(f"            {value_row}")
+        
+        column_list = ',\n'.join(column_rows)
+        value_list = ',\n'.join(value_rows)
         
         return f"""    <insert id="insert{self.entity_name}">
         /*{self.mapper_name}.insert{self.entity_name}*/
         insert into {self.table_name} (
-            {column_list}
+{column_list}
         ) values (
-            {value_list}
+{value_list}
         )
     </insert>"""
     
@@ -146,8 +166,8 @@ class MapperGenerator:
             where_conditions.append(f"{pk['db_name']} = #{{{pk['java_name']}}}")
         where_clause = '\n        and '.join(where_conditions)
         
-        # Use FILL_THIS_TYPE for resultType
-        result_type = "FILL_THIS_TYPE"
+        # Use FILL_THIS_VALUE for resultType
+        result_type = "FILL_THIS_VALUE"
         
         return f"""    <select id="get{self.entity_name}" resultType="{result_type}">
         /*{self.mapper_name}.get{self.entity_name}*/
@@ -165,7 +185,7 @@ class MapperGenerator:
         if has_update:
             xml_content = f"""<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="FILL_THIS_TYPE">
+<mapper namespace="FILL_THIS_VALUE">
 
 {self.generate_insert()}
 
@@ -181,7 +201,7 @@ class MapperGenerator:
             print(f"ℹ️  Table {self.table_name} does not have updater/updateDt columns - skipping UPDATE generation")
             xml_content = f"""<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="FILL_THIS_TYPE">
+<mapper namespace="FILL_THIS_VALUE">
 
 {self.generate_insert()}
 
@@ -341,7 +361,7 @@ public class {self.entity_name}Entity{extends_clause} {{
         with open(entity_filepath, 'w', encoding='utf-8') as f:
             f.write(entity_content)
         
-        print(f"✅ Files generated successfully in temp/{self.table_name}/")
+        print(f"✅ Files generated successfully in result/{self.table_name}/")
         print(f"📁 XML file: {xml_filepath}")
         print(f"📁 Mapper Interface: {java_filepath}")
         print(f"📁 Entity Class: {entity_filepath}")
