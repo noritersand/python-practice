@@ -166,8 +166,8 @@ class MapperGenerator:
             where_conditions.append(f"{pk['db_name']} = #{{{pk['java_name']}}}")
         where_clause = '\n        and '.join(where_conditions)
         
-        # Use FILL_THIS_VALUE for resultType
-        result_type = "FILL_THIS_VALUE"
+        # Use FILL_THIS_TYPE for resultType
+        result_type = "FILL_THIS_TYPE"
         
         return f"""    <select id="get{self.entity_name}" resultType="{result_type}">
         /*{self.mapper_name}.get{self.entity_name}*/
@@ -185,7 +185,7 @@ class MapperGenerator:
         if has_update:
             xml_content = f"""<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="FILL_THIS_VALUE">
+<mapper namespace="FILL_THIS_TYPE">
 
 {self.generate_insert()}
 
@@ -201,7 +201,7 @@ class MapperGenerator:
             print(f"ℹ️  Table {self.table_name} does not have updater/updateDt columns - skipping UPDATE generation")
             xml_content = f"""<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="FILL_THIS_VALUE">
+<mapper namespace="FILL_THIS_TYPE">
 
 {self.generate_insert()}
 
