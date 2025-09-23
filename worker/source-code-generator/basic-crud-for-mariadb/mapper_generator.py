@@ -181,7 +181,18 @@ class MapperGenerator:
             {columns_str}
         from {self.table_name}
         where {where_clause}
-    </select>"""
+    </select>
+    
+    <select id="search" resultType="{result_type}">
+        /*{self.mapper_name}.search*/
+        select
+            {columns_str}
+        from {self.table_name}
+        <where>
+        and {where_clause}
+        </where>
+    </select>    
+    """
     
     def generate_mapper_xml(self) -> str:
         """Generate complete Mapper XML file"""
@@ -237,7 +248,9 @@ class MapperGenerator:
     int update({self.entity_name}Entity entity);
 """
         
-        interface_content = f"""/**
+        interface_content = f"""import java.util.List;
+        
+/**
  * {self.table_name} 테이블용 마이바티스 쿼리 매퍼
  */
 public interface {self.mapper_name} {{
@@ -258,12 +271,22 @@ public interface {self.mapper_name} {{
     int delete(FILL_THIS_TYPE params);
 
     /**
-     * {self.table_name} 기본 select 메서드
+     * {self.table_name} 기본 단 건 select 메서드
+     * (다른 테이블과 JOIN 금지)
      *
      * @param params 검색 조건
      * @return 조회 결과
      */
     {self.entity_name}Entity getByPk(FILL_THIS_TYPE params);
+    
+    /**
+     * {self.table_name} 기본 여러 건 select 메서드
+     * (다른 테이블과 JOIN 금지)
+     *
+     * @param params 검색 조건
+     * @return 조회 결과
+     */
+    List<{self.entity_name}Entity> search(FILL_THIS_TYPE params);
 
 }}"""
         
