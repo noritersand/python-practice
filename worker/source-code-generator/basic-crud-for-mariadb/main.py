@@ -21,7 +21,7 @@ def print_usage():
     print("  - MyBatis Mapper XML file")
     print("  - Java Mapper Interface file")
     print("  - Java Entity Class file")
-    print("\nGenerated files will be saved in 'result/<table_name>/' directory")
+    print("\nGenerated files will be saved in 'output/<table_name>/' directory")
 
 
 def main():

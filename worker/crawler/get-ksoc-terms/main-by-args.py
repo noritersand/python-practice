@@ -54,10 +54,10 @@ except:
 driver.execute_script("movePinfo()")
 time.sleep(1)
 
-# result/ 디렉터리 생성하기
-resultDir = './result/'
-if not os.path.isdir(resultDir):
-    os.mkdir(resultDir)
+# output/ 디렉터리 생성하기
+outputDir = './output/'
+if not os.path.isdir(outputDir):
+    os.mkdir(outputDir)
 
 driver.execute_script(f"fnMoveClass('P', '{args.no}', '{args.code}', '{args.name}')")
 time.sleep(1)
@@ -73,7 +73,7 @@ driver.get('https://g1.sports.or.kr/pinfo/player/sc246.do')
 
 content_element = driver.find_element(By.CSS_SELECTOR, 'div.intro-ex-item')
 
-f = codecs.open(f'./{resultDir}/{args.no}-{args.code}-개인정보처리방침.html', 'w', 'utf-8')
+f = codecs.open(f'./{outputDir}/{args.no}-{args.code}-개인정보처리방침.html', 'w', 'utf-8')
 f.write(content_element.get_attribute('innerHTML'))
 f.close()
 

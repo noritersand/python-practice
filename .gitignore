@@ -131,7 +131,7 @@ dmypy.json
 # #########################
 result.txt
 result/
-output*
+output/
 db.py
 account.py
 

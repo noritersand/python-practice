@@ -342,8 +342,8 @@ public class {self.entity_name}Entity{extends_clause} {{
     
     def save_to_file(self, xml_content: str, java_content: str, entity_content: str):
         """Save generated XML, Java Interface, and Entity files"""
-        # Create result/<table_name> directory
-        output_dir = Path("result") / self.table_name
+        # Create output/<table_name> directory
+        output_dir = Path("output") / self.table_name
         output_dir.mkdir(parents=True, exist_ok=True)
         
         # Generate filename with timestamp
@@ -367,7 +367,7 @@ public class {self.entity_name}Entity{extends_clause} {{
         with open(entity_filepath, 'w', encoding='utf-8') as f:
             f.write(entity_content)
         
-        print(f"✅ Files generated successfully in result/{self.table_name}/")
+        print(f"✅ Files generated successfully in output/{self.table_name}/")
         print(f"📁 XML file: {xml_filepath}")
         print(f"📁 Mapper Interface: {java_filepath}")
         print(f"📁 Entity Class: {entity_filepath}")

@@ -45,13 +45,13 @@ except:
 driver.execute_script("movePinfo()")
 time.sleep(1)
 
-# result/ 디렉터리 생성하기
-resultDir = './result/'
-if not os.path.isdir(resultDir):
-    os.mkdir(resultDir)
+# output/ 디렉터리 생성하기
+outputDir = './output/'
+if not os.path.isdir(outputDir):
+    os.mkdir(outputDir)
 
 def write_file(codeNo, code, name, content):
-    f = codecs.open(f'./{resultDir}/{codeNo}-{code}-{name}.html', 'w', 'utf-8')
+    f = codecs.open(f'./{outputDir}/{codeNo}-{code}-{name}.html', 'w', 'utf-8')
     f.write(content)
     f.close()
 
