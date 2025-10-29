@@ -65,6 +65,7 @@ python main.py
 ## 📊 데이터베이스 스키마
 
 ### code 테이블
+
 ```sql
 CREATE TABLE code (
     code VARCHAR(100) PRIMARY KEY,
@@ -76,6 +77,7 @@ CREATE TABLE code (
 ```
 
 ### code_item 테이블
+
 ```sql
 CREATE TABLE code_item (
     code VARCHAR(100),
@@ -91,10 +93,12 @@ CREATE TABLE code_item (
 ## 🔄 변환 규칙
 
 ### 클래스명 변환
+
 - 모든 코드는 `ChangeThisTypeName`으로 생성됨
 - 개발자가 직접 의미있는 이름으로 수정 필요
 
 ### Enum 상수명 변환
+
 - `CHANGE_THIS_FIELD_NAME1`, `CHANGE_THIS_FIELD_NAME2`, ... 형식으로 생성
 - 개발자가 직접 의미있는 이름으로 수정 필요
 
@@ -148,6 +152,7 @@ public enum ChangeThisTypeName {
 ```
 
 ⚠️ **생성된 코드 수정 필요**:
+
 1. `ChangeThisTypeName` → 실제 의미있는 클래스명으로 변경 (예: `CreatorTypeCode`)
 2. `CHANGE_THIS_FIELD_NAME1~4` → 실제 의미있는 필드명으로 변경 (예: `ADMIN_MANAGER`, `BIZ_MANAGER`, `MEMBER`, `DIGITAL_ID`)
 
@@ -161,10 +166,12 @@ public enum ChangeThisTypeName {
 ## 🛠 문제 해결
 
 ### DB 연결 실패
+
 - `db.py`의 연결 정보 확인
 - MariaDB 서버 실행 상태 확인
 - 방화벽 설정 확인
 
 ### 한글 깨짐
+
 - 데이터베이스와 테이블의 문자셋이 `utf8mb4`인지 확인
 - Python 파일 인코딩이 UTF-8인지 확인
