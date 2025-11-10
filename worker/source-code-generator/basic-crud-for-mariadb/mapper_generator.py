@@ -330,16 +330,6 @@ public interface {self.mapper_name} {{
             "import com.ana.anypass.common.model.AuditColumns;"
         ]
         
-        # Add imports for Java types
-        if any('java.time.LocalDateTime' in col['java_type'] for col in regular_columns):
-            imports.append("import java.time.LocalDateTime;")
-        if any('java.time.LocalDate' in col['java_type'] for col in regular_columns):
-            imports.append("import java.time.LocalDate;")
-        if any('java.time.LocalTime' in col['java_type'] for col in regular_columns):
-            imports.append("import java.time.LocalTime;")
-        if any('BigDecimal' in col['java_type'] for col in regular_columns):
-            imports.append("import java.math.BigDecimal;")
-        
         imports.extend([
             "import lombok.Getter;",
             "import lombok.Setter;"
