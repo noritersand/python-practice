@@ -105,10 +105,10 @@ class MapperGenerator:
             if col['db_name'] in ['updater', 'updateDt']:
                 continue  # Handle these separately
             set_clauses.append(
-                f'            <if test="{col["java_name"]} != null">{col["db_name"]} = #{{{col["java_name"]}}},</if>'
+                f'<if test="{col["java_name"]} != null">{col["db_name"]} = #{{{col["java_name"]}}},</if>'
             )
         
-        set_clause_str = '\n'.join(set_clauses)
+        set_clause_str = '\n            '.join(set_clauses)
         
         # Add updater and updateDt
         update_fields = ""
@@ -128,8 +128,7 @@ class MapperGenerator:
         return f"""    <update id="update">
         /*{self.mapper_name}.update*/
         update {self.table_name}
-        set
-{set_clause_str}
+        set {set_clause_str}
 {update_fields}
         where {where_clause}
     </update>"""
