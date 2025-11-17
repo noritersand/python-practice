@@ -39,6 +39,41 @@ class MapperGenerator:
         column_names = [col['db_name'] for col in self.columns]
         return 'updater' in column_names and 'updateDt' in column_names
     
+    def generate_pk_params(self, with_annotation: bool = False) -> str:
+        """Generate primary key parameters for method signature
+        
+        Args:
+            with_annotation: If True, add @Param annotation to each parameter
+        """
+        if not self.primary_keys:
+            return "FILL_THIS_TYPE params"
+        
+        params = []
+        for pk in self.primary_keys:
+            # Extract simple type name from full qualified name
+            java_type = pk['java_type']
+            simple_type = java_type.split('.')[-1] if '.' in java_type else java_type
+            
+            if with_annotation:
+                params.append(f'@Param("{pk["java_name"]}") {simple_type} {pk["java_name"]}')
+            else:
+                params.append(f"{simple_type} {pk['java_name']}")
+        
+        return ', '.join(params)
+    
+    def generate_pk_javadoc_params(self) -> str:
+        """Generate JavaDoc @param entries for all PK parameters"""
+        if not self.primary_keys:
+            return "     * @param params 검색 조건"
+        
+        javadoc_params = []
+        for pk in self.primary_keys:
+            comment = pk.get('comment', '')
+            param_desc = comment if comment else pk['db_name']
+            javadoc_params.append(f"     * @param {pk['java_name']} {param_desc}")
+        
+        return '\n'.join(javadoc_params)
+    
     def generate_insert(self) -> str:
         """Generate INSERT statement"""
         # Filter out auto-increment primary key and auto-generated timestamps
@@ -234,6 +269,12 @@ class MapperGenerator:
         # Check if UPDATE is needed
         has_update = self.has_update_columns()
         
+        # Generate PK parameters with @Param annotation
+        pk_params_with_annotation = self.generate_pk_params(with_annotation=True)
+        
+        # Generate JavaDoc @param entries
+        pk_javadoc_params = self.generate_pk_javadoc_params()
+        
         # Generate update method only if needed
         update_method = ""
         if has_update:
@@ -248,6 +289,7 @@ class MapperGenerator:
 """
         
         interface_content = f"""import java.util.List;
+import org.apache.ibatis.annotations.Param;
         
 /**
  * {self.table_name} 테이블용 마이바티스 쿼리 매퍼
@@ -264,19 +306,19 @@ public interface {self.mapper_name} {{
     /**
      * {self.table_name} 기본 delete 메서드
      *
-     * @param params 검색 조건
+{pk_javadoc_params}
      * @return 처리 개수
      */
-    int delete(FILL_THIS_TYPE params);
+    int delete({pk_params_with_annotation});
 
     /**
      * {self.table_name} 기본 단 건 select 메서드
      * (다른 테이블과 JOIN 금지)
      *
-     * @param params 검색 조건
+{pk_javadoc_params}
      * @return 조회 결과
      */
-    {self.entity_name}Entity getByPk(FILL_THIS_TYPE params);
+    {self.entity_name}Entity getByPk({pk_params_with_annotation});
     
     /**
      * {self.table_name} 기본 여러 건 select 메서드
@@ -380,9 +422,9 @@ public class {self.entity_name}Entity{extends_clause} {{
             f.write(entity_content)
         
         print(f"✅ Files generated successfully in output/{self.table_name}/")
-        print(f"📁 XML file: {xml_filepath}")
-        print(f"📁 Mapper Interface: {java_filepath}")
-        print(f"📁 Entity Class: {entity_filepath}")
+        print(f"📄 XML file: {xml_filepath}")
+        print(f"📄 Mapper Interface: {java_filepath}")
+        print(f"📄 Entity Class: {entity_filepath}")
         return xml_filepath, java_filepath, entity_filepath
     
     def generate(self):
