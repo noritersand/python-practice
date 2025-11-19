@@ -288,12 +288,15 @@ class MapperGenerator:
     int update({self.entity_name}Entity entity);
 """
         
-        interface_content = f"""import java.util.List;
-import org.apache.ibatis.annotations.Param;
-        
+        interface_content = f"""import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
 /**
  * {self.table_name} 테이블용 마이바티스 쿼리 매퍼
  */
+@Repository
 public interface {self.mapper_name} {{
     /**
      * {self.table_name} 기본 insert 메서드
