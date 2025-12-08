@@ -225,6 +225,7 @@ class MapperGenerator:
         <where>
         and {where_clause}
         </where>
+        order by createDt desc
     </select>    
     """
     
